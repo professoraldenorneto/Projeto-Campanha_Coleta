@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "Report": {
+      "title": "Trash Report",
+      "description": "A report of irregular trash disposal.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "photoUrl": { "type": "string" },
+        "description": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "verified", "scheduled", "collected", "dismissed"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "reporterId": { "type": "string" },
+        "assignedDriverId": { "type": "string" }
+      },
+      "required": ["lat", "lng", "status", "createdAt", "reporterId"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "User profile information including role and gamification.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": {
+          "type": "string",
+          "enum": ["citizen", "driver", "admin"]
+        },
+        "points": { "type": "number" },
+        "badges": { 
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["name", "email", "role"]
+    }
+  },
+  "firestore": {
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Collection of trash reports."
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles."
+    }
+  }
+}

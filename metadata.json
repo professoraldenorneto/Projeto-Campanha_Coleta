@@ -1,0 +1,6 @@
+{
+  "name": "Campanha de Coleta Luziânia",
+  "description": "App para denúncia de descarte irregular de lixo e gerenciamento de coleta em Luziânia.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": []
+}
