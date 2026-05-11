@@ -17,6 +17,16 @@
           },
           "required": ["lat", "lng"]
         },
+        "address": {
+          "type": "object",
+          "properties": {
+            "street": { "type": "string" },
+            "number": { "type": "string" },
+            "neighborhood": { "type": "string" },
+            "complement": { "type": "string" }
+          },
+          "required": ["street", "neighborhood"]
+        },
         "status": {
           "type": "string",
           "enum": ["pending", "in_progress", "collected"],

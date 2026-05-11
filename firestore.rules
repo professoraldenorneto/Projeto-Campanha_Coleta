@@ -37,8 +37,8 @@ service cloud.firestore {
 
     function isValidReport(data) {
       return data.imageUrl is string 
-        && data.location.lat is number 
-        && data.location.lng is number
+        && data.address.street is string
+        && data.address.neighborhood is string
         && data.status in ['pending', 'in_progress', 'collected']
         && data.userId is string
         && data.createdAt is timestamp;

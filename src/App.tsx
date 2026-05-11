@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
-import MapView from './components/MapView';
+import ReportList from './components/ReportList';
 import ReportForm from './components/ReportForm';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
@@ -83,7 +83,7 @@ export default function App() {
       {/* Main Content */}
       <main>
         {state === 'map' && (
-          <MapView onReportClick={() => setShowReportForm(true)} />
+          <ReportList onReportClick={() => setShowReportForm(true)} />
         )}
         {state === 'driver-view' && (
           <div className="max-w-4xl mx-auto p-6 space-y-6">

@@ -55,10 +55,21 @@ export default function MapView({ onReportClick }: { onReportClick: () => void }
     }
   };
 
-  if (!API_KEY) {
+  if (!API_KEY || API_KEY === 'MY_GOOGLE_MAPS_KEY') {
     return (
-      <div className="p-8 text-center bg-red-50 text-red-600 rounded-xl border border-red-100 m-4">
-        Configurações do Google Maps incompletas. Adicione a chave GOOGLE_MAPS_PLATFORM_KEY nos segredos.
+      <div className="flex flex-col items-center justify-center p-12 text-center bg-white h-[calc(100vh-64px)]">
+        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
+          <Info size={32} />
+        </div>
+        <h2 className="text-xl font-bold text-neutral-900 mb-2">Configuração Incompleta</h2>
+        <p className="text-neutral-600 max-w-sm mb-6">
+          Para visualizar o mapa, você precisa adicionar a chave <strong>GOOGLE_MAPS_PLATFORM_KEY</strong> no menu <strong>Settings &gt; Secrets</strong> do AI Studio.
+        </p>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          <div className="text-left bg-neutral-50 p-4 rounded-xl border border-neutral-200 font-mono text-xs">
+            GOOGLE_MAPS_PLATFORM_KEY="sua_chave_aqui"
+          </div>
+        </div>
       </div>
     );
   }

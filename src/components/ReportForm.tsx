@@ -12,6 +12,12 @@ interface ReportFormProps {
 export default function ReportForm({ onClose, onSuccess }: ReportFormProps) {
   const [image, setImage] = useState<string | null>(null);
   const [description, setDescription] = useState('');
+  const [address, setAddress] = useState({
+    street: '',
+    number: '',
+    neighborhood: '',
+    complement: ''
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,8 +35,14 @@ export default function ReportForm({ onClose, onSuccess }: ReportFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!image) {
       setError("Por favor, tire uma foto ou selecione uma imagem.");
+      return;
+    }
+
+    if (!address.street || !address.neighborhood) {
+      setError("Rua e Bairro são obrigatórios.");
       return;
     }
 
@@ -38,19 +50,9 @@ export default function ReportForm({ onClose, onSuccess }: ReportFormProps) {
     setError(null);
 
     try {
-      // Get current location
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
-
-      // In a real app, you'd upload the image to Firebase Storage first.
-      // Here we store the b64 string for demo purposes, but normally it's a URL.
       await addDoc(collection(db, 'reports'), {
         imageUrl: image, 
-        location: {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        },
+        address,
         description,
         status: 'pending',
         userId: auth.currentUser?.uid || 'anonymous',
@@ -108,21 +110,63 @@ export default function ReportForm({ onClose, onSuccess }: ReportFormProps) {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2 space-y-2">
+              <label className="text-sm font-bold text-emerald-900 flex items-center gap-2">
+                <MapPin size={14} /> Rua / Avenida *
+              </label>
+              <input
+                type="text"
+                required
+                value={address.street}
+                onChange={(e) => setAddress({...address, street: e.target.value})}
+                placeholder="Nome da rua ou avenida"
+                className="w-full p-3 bg-emerald-50 rounded-xl border border-emerald-100 outline-none focus:border-emerald-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-emerald-900">Número</label>
+              <input
+                type="text"
+                value={address.number}
+                onChange={(e) => setAddress({...address, number: e.target.value})}
+                placeholder="Ex: 123"
+                className="w-full p-3 bg-emerald-50 rounded-xl border border-emerald-100 outline-none focus:border-emerald-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-emerald-900">Bairro *</label>
+              <input
+                type="text"
+                required
+                value={address.neighborhood}
+                onChange={(e) => setAddress({...address, neighborhood: e.target.value})}
+                placeholder="Nome do bairro"
+                className="w-full p-3 bg-emerald-50 rounded-xl border border-emerald-100 outline-none focus:border-emerald-500"
+              />
+            </div>
+            <div className="col-span-2 space-y-2">
+              <label className="text-sm font-bold text-emerald-900">Complemento</label>
+              <input
+                type="text"
+                value={address.complement}
+                onChange={(e) => setAddress({...address, complement: e.target.value})}
+                placeholder="Ponto de referência, apto, etc."
+                className="w-full p-3 bg-emerald-50 rounded-xl border border-emerald-100 outline-none focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-bold text-emerald-900 flex items-center gap-2">
-              <Upload size={14} /> Descrição (Opcional)
+              <Upload size={14} /> Descrição Adicional
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descreva o que foi descartado ou detalhes do local..."
-              className="w-full p-4 bg-emerald-50 rounded-xl border border-emerald-100 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all h-32 resize-none text-emerald-900"
+              placeholder="Ex: entulho, móveis velhos, lixo doméstico..."
+              className="w-full p-3 bg-emerald-50 rounded-xl border border-emerald-100 outline-none focus:border-emerald-500 h-24 resize-none"
             />
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 p-3 rounded-lg">
-            <MapPin size={14} />
-            <span>Sua localização será capturada automaticamente ao enviar.</span>
           </div>
 
           {error && (
@@ -134,15 +178,9 @@ export default function ReportForm({ onClose, onSuccess }: ReportFormProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="w-full py-4 bg-emerald-600 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
           >
-            {loading ? (
-              <>
-                <Loader2 size={20} className="animate-spin" /> Enviando...
-              </>
-            ) : (
-              "Confirmar Denúncia"
-            )}
+            {loading ? <Loader2 size={20} className="animate-spin" /> : "Confirmar Denúncia"}
           </button>
         </form>
       </motion.div>

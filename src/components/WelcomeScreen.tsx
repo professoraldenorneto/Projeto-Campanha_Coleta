@@ -35,8 +35,8 @@ export default function WelcomeScreen({ onSelectRole }: WelcomeScreenProps) {
                 <LogIn size={24} />
               </div>
               <div className="text-left">
-                <p className="font-bold text-emerald-900">Já tenho conta</p>
-                <p className="text-sm text-emerald-600">Acessar denúncias e perfil</p>
+                <p className="font-bold text-emerald-900">Entrar como Cidadão</p>
+                <p className="text-sm text-emerald-600 text-left">Acesso anônimo rápido para testar</p>
               </div>
             </div>
           </button>
@@ -51,22 +51,7 @@ export default function WelcomeScreen({ onSelectRole }: WelcomeScreenProps) {
               </div>
               <div className="text-left">
                 <p className="font-bold text-emerald-900">Motorista Parceiro</p>
-                <p className="text-sm text-emerald-600">Coletar e atualizar status</p>
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => onSelectRole('signup')}
-            className="flex items-center justify-between w-full p-5 bg-white rounded-2xl shadow-sm border border-emerald-100 hover:border-emerald-500 hover:shadow-md transition-all group"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-emerald-100 text-emerald-600 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                <UserPlus size={24} />
-              </div>
-              <div className="text-left">
-                <p className="font-bold text-emerald-900">Novo Usuário</p>
-                <p className="text-sm text-emerald-600">Criar cadastro para denunciar</p>
+                <p className="text-sm text-emerald-600">Área de coleta e rotas</p>
               </div>
             </div>
           </button>
