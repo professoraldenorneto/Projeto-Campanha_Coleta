@@ -1,54 +1,65 @@
 {
   "entities": {
     "Report": {
-      "title": "Trash Report",
-      "description": "A report of irregular trash disposal.",
+      "title": "Report",
+      "description": "A garbage disposal report",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "lat": { "type": "number" },
-        "lng": { "type": "number" },
-        "photoUrl": { "type": "string" },
-        "description": { "type": "string" },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the uploaded image"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          },
+          "required": ["lat", "lng"]
+        },
         "status": {
           "type": "string",
-          "enum": ["pending", "verified", "scheduled", "collected", "dismissed"]
+          "enum": ["pending", "in_progress", "collected"],
+          "description": "Current status of the report"
         },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "reporterId": { "type": "string" },
-        "assignedDriverId": { "type": "string" }
+        "userId": {
+          "type": "string",
+          "description": "ID of the user who reported"
+        },
+        "description": {
+          "type": "string",
+          "description": "Additional details"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["lat", "lng", "status", "createdAt", "reporterId"]
+      "required": ["imageUrl", "location", "status", "userId", "createdAt"]
     },
     "User": {
-      "title": "User Profile",
-      "description": "User profile information including role and gamification.",
+      "title": "User",
+      "description": "App user profile",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
         "email": { "type": "string" },
+        "name": { "type": "string" },
         "role": {
           "type": "string",
           "enum": ["citizen", "driver", "admin"]
-        },
-        "points": { "type": "number" },
-        "badges": { 
-          "type": "array",
-          "items": { "type": "string" }
         }
       },
-      "required": ["name", "email", "role"]
+      "required": ["email", "role"]
     }
   },
   "firestore": {
-    "/reports/{reportId}": {
+    "reports": {
       "schema": "Report",
-      "description": "Collection of trash reports."
+      "description": "Collection of waste reports"
     },
-    "/users/{userId}": {
+    "users": {
       "schema": "User",
-      "description": "Collection of user profiles."
+      "description": "User profiles and roles"
     }
   }
 }

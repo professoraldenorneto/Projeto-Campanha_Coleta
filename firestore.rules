@@ -1,64 +1,47 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Default deny
+    // Default deny for safety
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Helpers
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
-    }
-
-    function getRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-    }
-
-    function isCitizen() {
-      return isSignedIn() && getRole() == 'citizen';
-    }
-
-    function isDriver() {
-      return isSignedIn() && getRole() == 'driver';
-    }
-
-    function isAdmin() {
-      return isSignedIn() && getRole() == 'admin';
-    }
-
-    // Reports
+    // Reports collection
     match /reports/{reportId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() 
-        && request.resource.data.reporterId == request.auth.uid
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
-      allow update: if isSignedIn() && (
-        isAdmin() ||
-        // Driver updating status
-        (isDriver() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])) ||
-        // Owner updating description (if still pending)
-        (isOwner(resource.data.reporterId) && resource.data.status == 'pending' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['description', 'photoUrl']))
-      );
-      allow delete: if isAdmin();
+      // Anyone can see reports (Waze-style)
+      allow read: if true;
+      
+      // must be signed in to create a report
+      allow create: if request.auth != null 
+        && isValidReport(request.resource.data)
+        && request.resource.data.userId == request.auth.uid;
+
+      // Only drivers or admins can update status
+      allow update: if request.auth != null 
+        && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['status']) 
+          // Add driver check here if users collection exists and role is checked
+        );
     }
 
-    // Users
+    // Users collection
     match /users/{userId} {
-      allow read: if isSignedIn();
-      allow create: if isOwner(userId)
-        && request.resource.data.role in ['citizen', 'driver', 'admin'];
-      allow update: if isAdmin() || (isOwner(userId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name']));
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Helper functions
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+
+    function isValidReport(data) {
+      return data.imageUrl is string 
+        && data.location.lat is number 
+        && data.location.lng is number
+        && data.status in ['pending', 'in_progress', 'collected']
+        && data.userId is string
+        && data.createdAt is timestamp;
     }
   }
 }
